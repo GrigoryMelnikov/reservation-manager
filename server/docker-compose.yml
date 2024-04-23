@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  python:
+    container_name: web-api
+    ports:
+      - 8000:8000
+    build:
+      context: ./
+      dockerfile: dockerfile
+    env_file:
+      - .env
+      - .env.database
+    tty: true
