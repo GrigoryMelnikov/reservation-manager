@@ -26,7 +26,7 @@ class User(Base):
 class Event(Base):
     __tablename__ = 'events'
     id = Column(INTEGER, primary_key=True, unique=True, autoincrement=True)
-    user_telefon = Column(VARCHAR, ForeignKey("users.mispar_telefon"))
+    owner_id = Column(VARCHAR, ForeignKey("users.mispar_telefon"))
     mispar_ishur = Column(VARCHAR, nullable=False)
     type_id = Column(INTEGER, ForeignKey("event_type.id"))
     size_id = Column(INTEGER, ForeignKey("event_size.id"))
