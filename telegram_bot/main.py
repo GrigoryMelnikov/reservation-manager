@@ -2,11 +2,11 @@ import nest_asyncio
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 from telegram.ext.filters import CONTACT
-import csv
 import asyncio
 from config import bot_token
 from DB_connector import postgres_exe
 from functions import phone_validation
+
 
 async def verify_user_token(token) -> bool:
     if len(postgres_exe("select * from inv_payed_customers where telegram_token='{}'".format(token))) > 0:
@@ -40,11 +40,14 @@ async def start(update: Update, context: CallbackContext) -> None:
 
 
 async def group_change(update: Update, context: CallbackContext) -> None:
-    group_name = context.args
+    group_name = context.args[0]
     user_id = update.effective_user.id
     if await verify_user_telegram(user_id):
-        postgres_exe('inset into inv_active_group(telegram_user_id, group_name) values({1},{2});'.format(user_id, group_name))
-        await update.message.reply_text('Active group set to {}.'.format(group_name))
+        if postgres_exe("insert into inv_active_group(telegram_user_id, group_name) values({0},'{1}');"
+                                .format(user_id, group_name), True):
+            await update.message.reply_text('Active group set to {}.'.format(group_name))
+        else:
+            await update.message.reply_text('Operation failed, please try again later.')
     else:
         await update.message.reply_text("You are not authorized!")
 
