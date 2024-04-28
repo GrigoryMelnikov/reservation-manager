@@ -3,6 +3,7 @@ from typing import List
 
 from models.models import Event
 from sqlalchemy import select, insert, update, delete
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.sql import func
 from sqlalchemy.orm import Session
 
@@ -80,6 +81,18 @@ class EventRepository:
             raise e
         
     @staticmethod
-    async def update(user_id, db: Session) -> None:
-        # TODO
-        pass
+    async def update(event: Event, db: Session) -> None:
+        statement = pg_insert(Event)
+        on_update_stmnt = statement.on_conflict_do_update(
+            index_elements=['event_id', 'mispar_telefon'],
+            # set_=dict(statement.excluded.items())
+            set_=statement.excluded
+        )
+        try:
+            db.execute(on_update_stmnt)
+        except IntegrityError as e:
+            logger.error(e, exc_info=True)
+            raise e
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise e
