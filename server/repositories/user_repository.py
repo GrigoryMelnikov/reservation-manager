@@ -45,6 +45,20 @@ class UserRepository:
         except Exception as e:
             logger.error(e, exc_info=True)
             raise e
+        
+    @staticmethod
+    async def create_bulk(users: List[User], db: Session) -> None:
+        try:
+            db.execute(insert(User), [user.__dict__ for user in users])
+            db.commit()
+            
+            [logger.info(f'New user added: {user.__dict__}') for user in users]
+        except IntegrityError as e:
+            logger.error(e, exc_info=True)
+            raise e
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise e
     
     @staticmethod
     async def delete(user_id, db: Session) -> None:
