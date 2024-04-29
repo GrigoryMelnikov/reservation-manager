@@ -5,7 +5,7 @@ from telegram.ext.filters import CONTACT
 import asyncio
 from config import bot_token
 from DB_connector import postgres_exe
-from functions import phone_validation
+from functions import phone_validation, remove_special_chars
 
 
 async def verify_user_token(token) -> bool:
@@ -57,9 +57,9 @@ async def receive_contact(update: Update, context: CallbackContext) -> None:
     user_id = update.effective_user.id
     contact = update.message.contact
     if str(contact.last_name) != 'None':
-        full_name = str(contact.first_name) + ' ' + str(contact.last_name)
+        full_name = remove_special_chars(str(contact.first_name) + ' ' + str(contact.last_name))
     else:
-        full_name = str(contact.first_name)
+        full_name = remove_special_chars(str(contact.first_name))
     if await verify_user_telegram(user_id):
         phone_data = phone_validation(contact.phone_number)
         if phone_data[1]:

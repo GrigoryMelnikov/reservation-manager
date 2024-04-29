@@ -13,3 +13,7 @@ def phone_validation(phone_num) -> list:
     except:
         bul_vali = False
     return [phone_num, bul_vali]
+
+
+def remove_special_chars(in_str) -> str:
+    return in_str.translate({ord(c): "" for c in "!'@#$%^&*()[]{};:,./<>?\|`~-=_+"}).translate({ord(c): '' for c in '"'})
