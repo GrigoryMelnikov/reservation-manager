@@ -35,12 +35,10 @@ class UserRepository:
     @staticmethod
     async def create(user: User, db: Session) -> None:
         try:
-            # Verbose option of ```db.execute(insert(User), user)```
-            transaction_output = db.scalar(
-                insert(User).returning(User),
-                user
-            ) 
-            logger.info('New user added: {transaction_output}')
+            db.execute(insert(User), user.__dict__)
+            db.commit()
+
+            logger.info(f'New user added: {user.__dict__}')
         except IntegrityError as e:
             logger.error(e, exc_info=True)
             raise e
@@ -52,6 +50,7 @@ class UserRepository:
     async def delete(user_id, db: Session) -> None:
         try:
             db.execute(delete(User).where(User.id == user_id))
+            db.commit()
         except IntegrityError as e:
             logger.error(e, exc_info=True)
             raise e
